@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pocket Arcade - پاکت آرکید</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --accent: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --text-color: #f8fafc;
+            --danger: #f43f5e;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            max-height: 850px;
+            background: var(--panel-bg);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border-radius: 0;
+        }
+
+        @media (min-width: 500px) {
+            #app {
+                border-radius: 24px;
+                border: 4px solid #334155;
+            }
+        }
+
+        /* Screen management */
+        .screen {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Hub Header */
+        .hub-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .hub-header h1 {
+            font-size: 2rem;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+        }
+
+        .hub-header p {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        /* Game Grid */
+        .game-grid {
+            flex: 1;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .game-card {
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .game-card:active {
+            transform: scale(0.95);
+            border-color: var(--accent);
+        }
+
+        .game-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .game-title {
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .game-highscore {
+            font-size: 0.75rem;
+            color: #fbbf24;
+        }
+
+        /* Game Header Bar */
+        .game-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: #0f172a;
+            border-bottom: 1px solid #334155;
+        }
+
+        .back-btn {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .back-btn:active {
+            background: #475569;
+        }
+
+        .score-board {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        /* Canvas Containers */
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: #020617;
+            overflow: hidden;
+        }
+
+        canvas {
+            background: #050b14;
+            display: block;
+            touch-action: none;
+        }
+
+        /* Touch Controls Overlay */
+        .controls-overlay {
+            padding: 15px;
+            background: #0f172a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid #334155;
+        }
+
+        /* D-Pad Controls */
+        .dpad {
+            display: grid;
+            grid-template-columns: 60px 60px 60px;
+            grid-template-rows: 50px 50px;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .dpad-btn {
+            background: #334155;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .dpad-btn:active {
+            background: var(--accent);
+            color: #0f172a;
+        }
+
+        .btn-up { grid-column: 2; grid-row: 1; }
+        .btn-left { grid-column: 1; grid-row: 2; }
+        .btn-down { grid-column: 2; grid-row: 2; }
+        .btn-right { grid-column: 3; grid-row: 2; }
+
+        /* Generic Action Buttons */
+        .action-row {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .action-btn {
+            background: var(--accent);
+            color: #0f172a;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            flex: 1;
+            max-width: 200px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .action-btn:active {
+            transform: scale(0.97);
+            background: var(--accent-hover);
+        }
+
+        /* Game Over Modal overlay inside screen */
+        .game-over-modal {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.85);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            backdrop-filter: blur(4px);
+        }
+
+        .game-over-modal h2 {
+            font-size: 2rem;
+            color: var(--danger);
+            margin-bottom: 10px;
+        }
+
+        .game-over-modal p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- Hub Screen -->
+    <div id="hub-screen" class="screen active">
+        <div class="hub-header">
+            <h1>Pocket Arcade</h1>
+            <p>مجموعه بازی‌های کلاسیک و حرفه‌ای جیبی</p>
+        </div>
+        <div class="game-grid">
+            <div class="game-card" onclick="openGame('snake')">
+                <div class="game-icon">🐍</div>
+                <div class="game-title">مار نوکیا</div>
+                <div class="game-highscore" id="hs-snake">رکورد: ۰</div>
+            </div>
+            <div class="game-card" onclick="openGame('bounce')">
+                <div class="game-icon">🔴</div>
+                <div class="game-title">توپ بادکنکی</div>
+                <div class="game-highscore" id="hs-bounce">رکورد: ۰</div>
+            </div>
+            <div class="game-card" onclick="openGame('pingpong')">
+                <div class="game-icon">🏓</div>
+                <div class="game-title">پینگ‌پونگ</div>
+                <div class="game-highscore" id="hs-pingpong">رکورد: ۰</div>
+            </div>
+            <div class="game-card" onclick="openGame('billiard')">
+                <div class="game-icon">🎱</div>
+                <div class="game-title">بیلیارد حرفه‌ای</div>
+                <div class="game-highscore" id="hs-billiard">رکورد: ۰</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. Snake Game Screen -->
+    <div id="snake-screen" class="screen">
+        <div class="game-top-bar">
+            <button class="back-btn" onclick="exitGame()">منو</button>
+            <div class="score-board">امتیاز: <span id="snake-score">0</span></div>
+        </div>
+        <div class="canvas-container">
+            <canvas id="snake-canvas" width="360" height="360"></canvas>
+            <div id="snake-gameover" class="game-over-modal">
+                <h2>باختی!</h2>
+                <p>امتیاز شما: <span id="snake-final-score">0</span></p>
+                <button class="action-btn" onclick="startSnake()">تلاش مجدد</button>
+            </div>
+        </div>
+        <div class="controls-overlay">
+            <div class="dpad">
+                <button class="dpad-btn btn-up" onclick="setSnakeDir(0, -1)">⬆️</button>
+                <button class="dpad-btn btn-left" onclick="setSnakeDir(-1, 0)">⬅️</button>
+                <button class="dpad-btn btn-down" onclick="setSnakeDir(0, 1)">⬇️</button>
+                <button class="dpad-btn btn-right" onclick="setSnakeDir(1, 0)">➡️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Bounce Game Screen -->
+    <div id="bounce-screen" class="screen">
+        <div class="game-top-bar">
+            <button class="back-btn" onclick="exitGame()">منو</button>
+            <div class="score-board">حلقه‌ها: <span id="bounce-score">0</span></div>
+        </div>
+        <div class="canvas-container">
+            <canvas id="bounce-canvas" width="360" height="420"></canvas>
+            <div id="bounce-gameover" class="game-over-modal">
+                <h2>بازی تمام شد!</h2>
+                <p>حلقه‌های جمع شده: <span id="bounce-final-score">0</span></p>
+                <button class="action-btn" onclick="startBounce()">تلاش مجدد</button>
+            </div>
+        </div>
+        <div class="controls-overlay">
+            <div class="action-row">
+                <button class="action-btn" onclick="bounceMove(-1)">چپ ◀️</button>
+                <button class="action-btn" onclick="bouncePump()" style="background:var(--success); color:white;">پمپ باد 🎈</button>
+                <button class="action-btn" onclick="bounceMove(1)">راست ▶️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Ping Pong Game Screen -->
+    <div id="pingpong-screen" class="screen">
+        <div class="game-top-bar">
+            <button class="back-btn" onclick="exitGame()">منو</button>
+            <div class="score-board">شما: <span id="pp-player-score">0</span> | ربات: <span id="pp-ai-score">0</span></div>
+        </div>
+        <div class="canvas-container">
+            <canvas id="pingpong-canvas" width="360" height="420"></canvas>
+            <div id="pingpong-gameover" class="game-over-modal">
+                <h2 id="pp-result-title">پایان بازی</h2>
+                <p id="pp-result-text">امتیاز نهایی</p>
+                <button class="action-btn" onclick="startPingPong()">بازی مجدد</button>
+            </div>
+        </div>
+        <div class="controls-overlay" style="font-size:0.85rem; color:#94a3b8; text-align:center;">
+            پدال پایین را با انگشت بکشید یا لمس کنید تا حرکت کند.
+        </div>
+    </div>
+
+    <!-- 4. Billiard Game Screen -->
+    <div id="billiard-screen" class="screen">
+        <div class="game-top-bar">
+            <button class="back-btn" onclick="exitGame()">منو</button>
+            <div class="score-board">توپ‌های باقیمانده: <span id="bill-balls-left">5</span></div>
+        </div>
+        <div class="canvas-container">
+            <canvas id="billiard-canvas" width="360" height="450"></canvas>
+            <div id="billiard-gameover" class="game-over-modal">
+                <h2>آفرین برنده شدی! 🎉</h2>
+                <p>تمام توپ‌ها وارد سوراخ شدند!</p>
+                <button class="action-btn" onclick="startBilliard()">بازی مجدد</button>
+            </div>
+        </div>
+        <div class="controls-overlay" style="font-size:0.85rem; color:#94a3b8; text-align:center;">
+            صفحه را بکشید و رها کنید تا به توپ سفید ضربه بزنید.
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global State & High Scores
+    let highScores = JSON.parse(localStorage.getItem('pocket_arcade_hs')) || {
+        snake: 0,
+        bounce: 0,
+        pingpong: 0,
+        billiard: 0
+    };
+
+    function updateHighScoresDisplay() {
+        document.getElementById('hs-snake').innerText = `رکورد: ${highScores.snake}`;
+        document.getElementById('hs-bounce').innerText = `رکورد: ${highScores.bounce}`;
+        document.getElementById('hs-pingpong').innerText = `رکورد: ${highScores.pingpong}`;
+        document.getElementById('hs-billiard').innerText = `رکورد: ${highScores.billiard}`;
+    }
+    updateHighScoresDisplay();
+
+    let currentGame = null;
+
+    function openGame(gameName) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        currentGame = gameName;
+        if (gameName === 'snake') {
+            document.getElementById('snake-screen').classList.add('active');
+            startSnake();
+        } else if (gameName === 'bounce') {
+            document.getElementById('bounce-screen').classList.add('active');
+            startBounce();
+        } else if (gameName === 'pingpong') {
+            document.getElementById('pingpong-screen').classList.add('active');
+            startPingPong();
+        } else if (gameName === 'billiard') {
+            document.getElementById('billiard-screen').classList.add('active');
+            startBilliard();
+        }
+    }
+
+    function exitGame() {
+        stopAllGames();
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('hub-screen').classList.add('active');
+        updateHighScoresDisplay();
+        currentGame = null;
+    }
+
+    let gameIntervals = [];
+    function stopAllGames() {
+        gameIntervals.forEach(clearInterval);
+        gameIntervals = [];
+        if(snakeAnimFrame) cancelAnimationFrame(snakeAnimFrame);
+        if(bounceAnimFrame) cancelAnimationFrame(bounceAnimFrame);
+        if(ppAnimFrame) cancelAnimationFrame(ppAnimFrame);
+        if(billAnimFrame) cancelAnimationFrame(billAnimFrame);
+    }
+
+    // ==========================================
+    // 1. SNAKE GAME
+    // ==========================================
+    const sCanvas = document.getElementById('snake-canvas');
+    const sCtx = sCanvas.getContext('2d');
+    let snake = [], food = {}, sDir = {x:1, y:0}, nextDir = {x:1, y:0}, snakeScore = 0, snakeAnimFrame = null, lastSnakeTime = 0;
+
+    function startSnake() {
+        document.getElementById('snake-gameover').style.display = 'none';
+        snake = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}];
+        sDir = {x: 1, y: 0};
+        nextDir = {x: 1, y: 0};
+        snakeScore = 0;
+        document.getElementById('snake-score').innerText = snakeScore;
+        spawnSnakeFood();
+        if(snakeAnimFrame) cancelAnimationFrame(snakeAnimFrame);
+        lastSnakeTime = performance.now();
+        snakeLoop(lastSnakeTime);
+    }
+
+    function spawnSnakeFood() {
+        food = {
+            x: Math.floor(Math.random() * 18),
+            y: Math.floor(Math.random() * 18)
+        };
+    }
+
+    function setSnakeDir(x, y) {
+        if (x !== -sDir.x || y !== -sDir.y) {
+            nextDir = {x, y};
+        }
+    }
+
+    // Touch swipe support for snake
+    let touchStartX = 0, touchStartY = 0;
+    sCanvas.addEventListener('touchstart', e => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    });
+    sCanvas.addEventListener('touchmove', e => {
+        if(!touchStartX || !touchStartY) return;
+        let diffX = e.touches[0].clientX - touchStartX;
+        let diffY = e.touches[0].clientY - touchStartY;
+        if(Math.abs(diffX) > 30 || Math.abs(diffY) > 30) {
+            if(Math.abs(diffX) > Math.abs(diffY)) {
+                setSnakeDir(diffX > 0 ? 1 : -1, 0);
+            } else {
+                setSnakeDir(0, diffY > 0 ? 1 : -1);
+            }
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }
+    });
+
+    function snakeLoop(time) {
+        if (currentGame !== 'snake') return;
+        if (time - lastSnakeTime > 110) {
+            lastSnakeTime = time;
+            sDir = nextDir;
+            let head = {x: snake[0].x + sDir.x, y: snake[0].y + sDir.y};
+
+            if (head.x < 0 || head.x >= 18 || head.y < 0 || head.y >= 18 || snake.some(p => p.x === head.x && p.y === head.y)) {
+                document.getElementById('snake-final-score').innerText = snakeScore;
+                document.getElementById('snake-gameover').style.display = 'flex';
+                if(snakeScore > highScores.snake) {
+                    highScores.snake = snakeScore;
+                    localStorage.setItem('pocket_arcade_hs', JSON.stringify(highScores));
+                }
+                return;
+            }
+
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                snakeScore += 10;
+                document.getElementById('snake-score').innerText = snakeScore;
+                spawnSnakeFood();
+            } else {
+                snake.pop();
+            }
+
+            // Render
+            sCtx.fillStyle = '#050b14';
+            sCtx.fillRect(0, 0, sCanvas.width, sCanvas.height);
+
+            // Food
+            sCtx.fillStyle = '#f43f5e';
+            sCtx.beginPath();
+            sCtx.arc(food.x * 20 + 10, food.y * 20 + 10, 8, 0, Math.PI * 2);
+            sCtx.fill();
+
+            // Snake
+            snake.forEach((p, idx) => {
+                sCtx.fillStyle = idx === 0 ? '#38bdf8' : '#0284c7';
+                sCtx.fillRect(p.x * 20 + 1, p.y * 20 + 1, 18, 18);
+            });
+        }
+        snakeAnimFrame = requestAnimationFrame(snakeLoop);
+    }
+
+    // ==========================================
+    // 2. BOUNCE GAME (توپ نوکیا با قابلیت باد شدن)
+    // ==========================================
+    const bCanvas = document.getElementById('bounce-canvas');
+    const bCtx = bCanvas.getContext('2d');
+    let bBall = {x: 50, y: 350, vx: 0, vy: 0, radius: 12, sizeState: 1}; // 1: normal, 2: big (floats), 0: small
+    let bRings = [], bSpikes = [], bScore = 0, bounceAnimFrame = null;
+
+    function startBounce() {
+        document.getElementById('bounce-gameover').style.display = 'none';
+        bBall = {x: 60, y: 300, vx: 0, vy: 0, radius: 12, sizeState: 1};
+        bScore = 0;
+        document.getElementById('bounce-score').innerText = bScore;
+        bRings = [
+            {x: 180, y: 250, collected: false},
+            {x: 280, y: 160, collected: false},
+            {x: 120, y: 90, collected: false}
+        ];
+        bSpikes = [
+            {x: 200, y: 380, w: 60, h: 10}
+        ];
+        if(bounceAnimFrame) cancelAnimationFrame(bounceAnimFrame);
+        bounceLoop();
+    }
+
+    function bounceMove(dir) {
+        bBall.vx = dir * 3.5;
+        setTimeout(() => { bBall.vx = 0; }, 400);
+    }
+
+    function bouncePump() {
+        bBall.sizeState = (bBall.sizeState + 1) % 3;
+        if(bBall.sizeState === 0) bBall.radius = 8;
+        else if(bBall.sizeState === 1) bBall.radius = 12;
+        else if(bBall.sizeState === 2) bBall.radius = 18;
+    }
+
+    function bounceLoop() {
+        if (currentGame !== 'bounce') return;
+
+        // Physics
+        let gravity = bBall.sizeState === 2 ? 0.15 : 0.4; // Big ball floats more
+        bBall.vy += gravity;
+        bBall.y += bBall.vy;
+        bBall.x += bBall.vx;
+
+        // Boundaries
+        if(bBall.x < bBall.radius) bBall.x = bBall.radius;
+        if(bBall.x > bCanvas.width - bBall.radius) bBall.x = bCanvas.width - bBall.radius;
+
+        // Floor collision
+        if(bBall.y > bCanvas.height - bBall.radius - 20) {
+            bBall.y = bCanvas.height - bBall.radius - 20;
+            bBall.vy = bBall.sizeState === 2 ? -5 : -7; // Bounce
+        }
+
+        // Ring collection
+        bRings.forEach(ring => {
+            if(!ring.collected) {
+                let dist = Math.hypot(bBall.x - ring.x, bBall.y - ring.y);
+                if(dist < bBall.radius + 12) {
+                    ring.collected = true;
+                    bScore += 1;
+                    document.getElementById('bounce-score').innerText = bScore;
+                    // Respawn ring
+                    ring.x = Math.random() * 300 + 30;
+                    ring.y = Math.random() * 250 + 50;
+                    ring.collected = false;
+                }
+            }
+        });
+
+        // Spike collision
+        bSpikes.forEach(s => {
+            if(bBall.x + bBall.radius > s.x && bBall.x - bBall.radius < s.x + s.w &&
+               bBall.y + bBall.radius > s.y && bBall.y - bBall.radius < s.y + s.h) {
+                document.getElementById('bounce-final-score').innerText = bScore;
+                document.getElementById('bounce-gameover').style.display = 'flex';
+                if(bScore > highScores.bounce) {
+                    highScores.bounce = bScore;
+                    localStorage.setItem('pocket_arcade_hs', JSON.stringify(highScores));
+                }
+                return;
+            }
+        });
+
+        // Render
+        bCtx.fillStyle = '#050b14';
+        bCtx.fillRect(0, 0, bCanvas.width, bCanvas.height);
+
+        // Floor
+        bCtx.fillStyle = '#334155';
+        bCtx.fillRect(0, bCanvas.height - 20, bCanvas.width, 20);
+
+        // Spikes
+        bCtx.fillStyle = '#f43f5e';
+        bSpikes.forEach(s => {
+            bCtx.fillRect(s.x, s.y, s.w, s.h);
+        });
+
+        // Rings
+        bCtx.strokeStyle = '#fbbf24';
+        bCtx.lineWidth = 3;
+        bRings.forEach(ring => {
+            if(!ring.collected) {
+                bCtx.beginPath();
+                bCtx.arc(ring.x, ring.y, 10, 0, Math.PI * 2);
+                bCtx.stroke();
+            }
+        });
+
+        // Ball
+        bCtx.fillStyle = bBall.sizeState === 2 ? '#38bdf8' : (bBall.sizeState === 0 ? '#10b981' : '#f43f5e');
+        bCtx.beginPath();
+        bCtx.arc(bBall.x, bBall.y, bBall.radius, 0, Math.PI * 2);
+        bCtx.fill();
+        bCtx.strokeStyle = '#ffffff';
+        bCtx.lineWidth = 2;
+        bCtx.stroke();
+
+        bounceAnimFrame = requestAnimationFrame(bounceLoop);
+    }
+
+    // ==========================================
+    // 3. PING PONG GAME
+    // ==========================================
+    const ppCanvas = document.getElementById('pingpong-canvas');
+    const ppCtx = ppCanvas.getContext('2d');
+    let ppBall = {x: 180, y: 210, vx: 3, vy: 3, radius: 8};
+    let playerPaddle = {x: 140, y: 390, w: 80, h: 12};
+    let aiPaddle = {x: 140, y: 18, w: 80, h: 12};
+    let pScore = 0, aiScore = 0, ppAnimFrame = null;
+
+    function startPingPong() {
+        document.getElementById('pingpong-gameover').style.display = 'none';
+        pScore = 0; aiScore = 0;
+        document.getElementById('pp-player-score').innerText = pScore;
+        document.getElementById('pp-ai-score').innerText = aiScore;
+        resetPPBall();
+        if(ppAnimFrame) cancelAnimationFrame(ppAnimFrame);
+        ppLoop();
+    }
+
+    function resetPPBall() {
+        ppBall.x = ppCanvas.width / 2;
+        ppBall.y = ppCanvas.height / 2;
+        ppBall.vx = (Math.random() > 0.5 ? 1 : -1) * 3;
+        ppBall.vy = (Math.random() > 0.5 ? 1 : -1) * 3.5;
+    }
+
+    ppCanvas.addEventListener('touchmove', e => {
+        let rect = ppCanvas.getBoundingClientRect();
+        let touchX = e.touches[0].clientX - rect.left;
+        playerPaddle.x = touchX - playerPaddle.w / 2;
+        if(playerPaddle.x < 0) playerPaddle.x = 0;
+        if(playerPaddle.x > ppCanvas.width - playerPaddle.w) playerPaddle.x = ppCanvas.width - playerPaddle.w;
+    });
+    ppCanvas.addEventListener('mousemove', e => {
+        let rect = ppCanvas.getBoundingClientRect();
+        let mouseX = e.clientX - rect.left;
+        playerPaddle.x = mouseX - playerPaddle.w / 2;
+        if(playerPaddle.x < 0) playerPaddle.x = 0;
+        if(playerPaddle.x > ppCanvas.width - playerPaddle.w) playerPaddle.x = ppCanvas.width - playerPaddle.w;
+    });
+
+    function ppLoop() {
+        if (currentGame !== 'pingpong') return;
+
+        // Ball movement
+        ppBall.x += ppBall.vx;
+        ppBall.y += ppBall.vy;
+
+        // Walls
+        if(ppBall.x < ppBall.radius || ppBall.x > ppCanvas.width - ppBall.radius) ppBall.vx *= -1;
+
+        // AI movement
+        let aiCenter = aiPaddle.x + aiPaddle.w / 2;
+        if(aiCenter < ppBall.x - 10) aiPaddle.x += 3;
+        else if(aiCenter > ppBall.x + 10) aiPaddle.x -= 3;
+        if(aiPaddle.x < 0) aiPaddle.x = 0;
+        if(aiPaddle.x > ppCanvas.width - aiPaddle.w) aiPaddle.x = ppCanvas.width - aiPaddle.w;
+
+        // Paddle collisions
+        // Player
+        if(ppBall.y + ppBall.radius >= playerPaddle.y && ppBall.x >= playerPaddle.x && ppBall.x <= playerPaddle.x + playerPaddle.w) {
+            ppBall.vy *= -1.05;
+            let hitPoint = ppBall.x - (playerPaddle.x + playerPaddle.w / 2);
+            ppBall.vx = hitPoint * 0.15;
+        }
+        // AI
+        if(ppBall.y - ppBall.radius <= aiPaddle.y + aiPaddle.h && ppBall.x >= aiPaddle.x && ppBall.x <= aiPaddle.x + aiPaddle.w) {
+            ppBall.vy *= -1.05;
+        }
+
+        // Scoring
+        if(ppBall.y > ppCanvas.height) {
+            aiScore++;
+            document.getElementById('pp-ai-score').innerText = aiScore;
+            resetPPBall();
+            checkPTEnd();
+        } else if(ppBall.y < 0) {
+            pScore++;
+            document.getElementById('pp-player-score').innerText = pScore;
+            resetPPBall();
+            checkPTEnd();
+        }
+
+        // Render
+        ppCtx.fillStyle = '#050b14';
+        ppCtx.fillRect(0, 0, ppCanvas.width, ppCanvas.height);
+
+        // Center net
+        ppCtx.strokeStyle = '#334155';
+        ppCtx.setLineDash([5, 5]);
+        ppCtx.beginPath();
+        ppCtx.moveTo(0, ppCanvas.height / 2);
+        ppCtx.lineTo(ppCanvas.width, ppCanvas.height / 2);
+        ppCtx.stroke();
+        ppCtx.setLineDash([]);
+
+        // Paddles
+        ppCtx.fillStyle = '#f43f5e';
+        ppCtx.fillRect(aiPaddle.x, aiPaddle.y, aiPaddle.w, aiPaddle.h);
+        ppCtx.fillStyle = '#38bdf8';
+        ppCtx.fillRect(playerPaddle.x, playerPaddle.y, playerPaddle.w, playerPaddle.h);
+
+        // Ball
+        ppCtx.fillStyle = '#fbbf24';
+        ppCtx.beginPath();
+        ppCtx.arc(ppBall.x, ppBall.y, ppBall.radius, 0, Math.PI * 2);
+        ppCtx.fill();
+
+        ppAnimFrame = requestAnimationFrame(ppLoop);
+    }
+
+    function checkPTEnd() {
+        if(pScore >= 5 || aiScore >= 5) {
+            document.getElementById('pp-result-title').innerText = pScore >= 5 ? "برنده شدید! 🏆" : "باختید!";
+            document.getElementById('pp-result-text').innerText = `نتیجه: ${pScore} بر ${aiScore}`;
+            document.getElementById('pingpong-gameover').style.display = 'flex';
+            if(pScore > highScores.pingpong) {
+                highScores.pingpong = pScore;
+                localStorage.setItem('pocket_arcade_hs', JSON.stringify(highScores));
+            }
+        }
+    }
+
+    // ==========================================
+    // 4. BILLIARD GAME (بیلیارد حرفه‌ای با مکانیک کشیدن و رها کردن)
+    // ==========================================
+    const billCanvas = document.getElementById('billiard-canvas');
+    const billCtx = billCanvas.getContext('2d');
+    let cueBall = {x: 180, y: 330, vx: 0, vy: 0, radius: 10};
+    let targetBalls = [];
+    let pockets = [
+        {x: 20, y: 20, r: 16},
+        {x: 340, y: 20, r: 16},
+        {x: 20, y: 430, r: 16},
+        {x: 340, y: 430, r: 16}
+    ];
+    let isAiming = false, aimStart = {x:0, y:0}, aimEnd = {x:0, y:0}, billAnimFrame = null;
+
+    function startBilliard() {
+        document.getElementById('billiard-gameover').style.display = 'none';
+        cueBall = {x: 180, y: 350, vx: 0, vy: 0, radius: 10};
+        targetBalls = [
+            {x: 180, y: 120, vx: 0, vy: 0, radius: 10, color: '#f43f5e', active: true},
+            {x: 150, y: 150, vx: 0, vy: 0, radius: 10, color: '#fbbf24', active: true},
+            {x: 210, y: 150, vx: 0, vy: 0, radius: 10, color: '#38bdf8', active: true},
+            {x: 180, y: 180, vx: 0, vy: 0, radius: 10, color: '#a855f7', active: true},
+            {x: 130, y: 180, vx: 0, vy: 0, radius: 10, color: '#10b981', active: true}
+        ];
+        updateBilliardUI();
+        if(billAnimFrame) cancelAnimationFrame(billAnimFrame);
+        billiardLoop();
+    }
+
+    function updateBilliardUI() {
+        let activeCount = targetBalls.filter(b => b.active).length;
+        document.getElementById('bill-balls-left').innerText = activeCount;
+    }
+
+    // Touch controls for Billiard cue
+    billCanvas.addEventListener('touchstart', e => {
+        if(cueBall.vx !== 0 || cueBall.vy !== 0) return;
+        let rect = billCanvas.getBoundingClientRect();
+        let tx = e.touches[0].clientX - rect.left;
+        let ty = e.touches[0].clientY - rect.top;
+        if(Math.hypot(tx - cueBall.x, ty - cueBall.y) < 30) {
+            isAiming = true;
+            aimStart = {x: cueBall.x, y: cueBall.y};
+            aimEnd = {x: tx, y: ty};
+        }
+    });
+
+    billCanvas.addEventListener('touchmove', e => {
+        if(!isAiming) return;
+        let rect = billCanvas.getBoundingClientRect();
+        aimEnd = {
+            x: e.touches[0].clientX - rect.left,
+            y: e.touches[0].clientY - rect.top
+        };
+    });
+
+    billCanvas.addEventListener('touchend', e => {
+        if(!isAiming) return;
+        isAiming = false;
+        let dx = aimEnd.x - cueBall.x;
+        let dy = aimEnd.y - cueBall.y;
+        cueBall.vx = -dx * 0.15;
+        cueBall.vy = -dy * 0.15;
+    });
+
+    // Mouse support for testing on desktop
+    billCanvas.addEventListener('mousedown', e => {
+        if(cueBall.vx !== 0 || cueBall.vy !== 0) return;
+        let rect = billCanvas.getBoundingClientRect();
+        let tx = e.clientX - rect.left;
+        let ty = e.clientY - rect.top;
+        if(Math.hypot(tx - cueBall.x, ty - cueBall.y) < 30) {
+            isAiming = true;
+            aimStart = {x: cueBall.x, y: cueBall.y};
+            aimEnd = {x: tx, y: ty};
+        }
+    });
+    billCanvas.addEventListener('mousemove', e => {
+        if(!isAiming) return;
+        let rect = billCanvas.getBoundingClientRect();
+        aimEnd = {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+    });
+    billCanvas.addEventListener('mouseup', e => {
+        if(!isAiming) return;
+        isAiming = false;
+        let dx = aimEnd.x - cueBall.x;
+        let dy = aimEnd.y - cueBall.y;
+        cueBall.vx = -dx * 0.15;
+        cueBall.vy = -dy * 0.15;
+    });
+
+    function billiardLoop() {
+        if (currentGame !== 'billiard') return;
+
+        // Physics & Friction
+        let friction = 0.985;
+        cueBall.x += cueBall.vx;
+        cueBall.y += cueBall.vy;
+        cueBall.vx *= friction;
+        cueBall.vy *= friction;
+
+        if(Math.abs(cueBall.vx) < 0.1) cueBall.vx = 0;
+        if(Math.abs(cueBall.vy) < 0.1) cueBall.vy = 0;
+
+        // Wall collisions for cue ball (inside table borders 20 to 340, 20 to 430)
+        if(cueBall.x < 30) { cueBall.x = 30; cueBall.vx *= -1; }
+        if(cueBall.x > billCanvas.width - 30) { cueBall.x = billCanvas.width - 30; cueBall.vx *= -1; }
+        if(cueBall.y < 30) { cueBall.y = 30; cueBall.vy *= -1; }
+        if(cueBall.y > billCanvas.height - 30) { cueBall.y = billCanvas.height - 30; cueBall.vy *= -1; }
+
+        // Target balls physics & collisions
+        targetBalls.forEach(ball => {
+            if(!ball.active) return;
+            ball.x += ball.vx;
+            ball.y += ball.vy;
+            ball.vx *= friction;
+            ball.vy *= friction;
+            if(Math.abs(ball.vx) < 0.1) ball.vx = 0;
+            if(Math.abs(ball.vy) < 0.1) ball.vy = 0;
+
+            if(ball.x < 30) { ball.x = 30; ball.vx *= -1; }
+            if(ball.x > billCanvas.width - 30) { ball.x = billCanvas.width - 30; ball.vx *= -1; }
+            if(ball.y < 30) { ball.y = 30; ball.vy *= -1; }
+            if(ball.y > billCanvas.height - 30) { ball.y = billCanvas.height - 30; ball.vy *= -1; }
+
+            // Cue to ball collision
+            let dist = Math.hypot(cueBall.x - ball.x, cueBall.y - ball.y);
+            if(dist < cueBall.radius + ball.radius) {
+                let overlap = (cueBall.radius + ball.radius) - dist;
+                let angle = Math.atan2(ball.y - cueBall.y, ball.x - cueBall.x);
+                ball.vx += Math.cos(angle) * 3;
+                ball.vy += Math.sin(angle) * 3;
+                cueBall.vx -= Math.cos(angle) * 2;
+                cueBall.vy -= Math.sin(angle) * 2;
+            }
+
+            // Pocket check
+            pockets.forEach(p => {
+                if(Math.hypot(ball.x - p.x, ball.y - p.y) < p.r) {
+                    ball.active = false;
+                    ball.x = -100; ball.y = -100;
+                    ball.vx = 0; ball.vy = 0;
+                    updateBilliardUI();
+                    checkBilliardWin();
+                }
+            });
+        });
+
+        // Render Table
+        billCtx.fillStyle = '#064e3b'; // Green felt
+        billCtx.fillRect(0, 0, billCanvas.width, billCanvas.height);
+
+        // Wooden borders
+        billCtx.strokeStyle = '#78350f';
+        billCtx.lineWidth = 20;
+        billCtx.strokeRect(10, 10, billCanvas.width - 20, billCanvas.height - 20);
+
+        // Pockets
+        billCtx.fillStyle = '#020617';
+        pockets.forEach(p => {
+            billCtx.beginPath();
+            billCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            billCtx.fill();
+        });
+
+        // Draw Aim Line
+        if(isAiming) {
+            billCtx.strokeStyle = '#f8fafc';
+            billCtx.lineWidth = 2;
+            billCtx.setLineDash([4, 4]);
+            billCtx.beginPath();
+            billCtx.moveTo(cueBall.x, cueBall.y);
+            let pullX = cueBall.x + (aimEnd.x - aimStart.x);
+            let pullY = cueBall.y + (aimEnd.y - aimStart.y);
+            billCtx.lineTo(pullX, pullY);
+            billCtx.stroke();
+            billCtx.setLineDash([]);
+        }
+
+        // Draw Target Balls
+        targetBalls.forEach(ball => {
+            if(!ball.active) return;
+            billCtx.fillStyle = ball.color;
+            billCtx.beginPath();
+            billCtx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            billCtx.fill();
+            billCtx.strokeStyle = '#ffffff';
+            billCtx.lineWidth = 1.5;
+            billCtx.stroke();
+        });
+
+        // Draw Cue Ball
+        billCtx.fillStyle = '#ffffff';
+        billCtx.beginPath();
+        billCtx.arc(cueBall.x, cueBall.y, cueBall.radius, 0, Math.PI * 2);
+        billCtx.fill();
+
+        billAnimFrame = requestAnimationFrame(billiardLoop);
+    }
+
+    function checkBilliardWin() {
+        let activeCount = targetBalls.filter(b => b.active).length;
+        if(activeCount === 0) {
+            document.getElementById('billiard-gameover').style.display = 'flex';
+            if(1 > highScores.billiard) {
+                highScores.billiard = 1;
+                localStorage.setItem('pocket_arcade_hs', JSON.stringify(highScores));
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
