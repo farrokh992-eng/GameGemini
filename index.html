@@ -1,270 +1,174 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f3f6fb">
-<title>Pocket Arcade 3D</title>
-<style>
-:root{color-scheme:light;--bg:#f3f6fb;--card:#fff;--ink:#172033;--muted:#65748b;--line:#dce4ef;--blue:#2563eb;--cyan:#0891b2;--green:#059669;--red:#e11d48;--shadow:0 14px 38px #18233b12}body.dark{color-scheme:dark;--bg:#0b1220;--card:#111c2d;--ink:#e8eef8;--muted:#a2b0c5;--line:#26364d;--shadow:0 14px 38px #0005}body.dark .top,body.dark .gamebar{background:#111c2d}body.dark .hero{background:radial-gradient(ellipse at 10% 0%,#1b3151 0,transparent 45%),linear-gradient(135deg,#111c2d,#142238)}body.dark .game-card{background:linear-gradient(160deg,#172438,#111c2d);color:var(--ink)}body.dark .note{background:#142742;color:#d8e5f8;border-color:#2b466b}body.dark .btn{background:#26364d;color:#e8eef8}body.dark .btn.primary{background:#2563eb;color:#fff}body.dark .overlay-card{background:#152237;color:#e8eef8;border-color:#2c3b52}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink)}
-button{font:inherit;cursor:pointer;touch-action:manipulation}button:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
-#app{max-width:1100px;min-height:100dvh;margin:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:#ffffffd9;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
-.brand{display:flex;align-items:center;gap:10px}.brand-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(145deg,#2563eb,#06b6d4);color:#fff;display:grid;place-items:center;font-size:23px;box-shadow:0 7px 15px #2563eb30}.brand h1{font-size:1.12rem;margin:0}.brand p{font-size:.76rem;color:var(--muted);margin:2px 0 0}
-.pill{border:1px solid #cfe0f5;background:#eff6ff;color:#1d4ed8;padding:7px 11px;border-radius:999px;font-size:.8rem;font-weight:700;white-space:nowrap}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
-#hub{display:block}.hero{padding:28px 24px 20px;background:radial-gradient(ellipse at 10% 0%,#dbeafe 0,transparent 45%),linear-gradient(135deg,#fff,#f5faff)}.hero h2{font-size:clamp(1.5rem,4vw,2.35rem);margin:0 0 8px;letter-spacing:-.5px}.hero p{margin:0;color:var(--muted);line-height:1.9;max-width:720px}
-.game-grid{padding:18px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.game-card{border:1px solid var(--line);background:linear-gradient(160deg,#fff,#f8fbff);border-radius:18px;min-height:190px;padding:18px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:.18s;box-shadow:0 5px 14px #18233b08}.game-card:hover{transform:translateY(-3px);border-color:#9dc5fa;box-shadow:0 12px 24px #2563eb13}.game-emoji{font-size:2.6rem}.game-card strong{font-size:1rem}.game-card small{color:var(--muted);line-height:1.6}.best{font-size:.76rem;color:#92400e;background:#fffbeb;padding:4px 9px;border-radius:99px}
-.note{margin:0 18px 18px;padding:12px 14px;border:1px solid #dbeafe;background:#eff6ff;color:#334155;border-radius:13px;font-size:.82rem;line-height:1.8}
-#game{display:none}.gamebar{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:12px 15px;border-bottom:1px solid var(--line);background:#fbfdff}.gamebar-left{display:flex;align-items:center;gap:10px;min-width:0}.gamebar h2{font-size:1rem;margin:0;white-space:nowrap}.stats{font-weight:800;color:#1d4ed8;font-size:.88rem;white-space:nowrap}.btn{border:0;border-radius:11px;padding:9px 13px;background:#e8eef7;color:#26354b;font-weight:750}.btn.primary{background:var(--blue);color:#fff}.btn.green{background:var(--green);color:#fff}.btn:active{transform:scale(.98)}
-#viewport{position:relative;height:min(66dvh,660px);min-height:340px;background:radial-gradient(ellipse at 50% 25%,#1c3850,#071321 75%);overflow:hidden;touch-action:none}#viewport canvas{display:block;width:100%;height:100%;touch-action:none}
-.hud{position:absolute;inset:12px 12px auto 12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.hud span{background:#061526c9;color:#eaf5ff;border:1px solid #ffffff20;border-radius:10px;padding:7px 10px;font-size:.76rem;backdrop-filter:blur(6px)}
-.controls{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:13px 15px;border-top:1px solid var(--line)}.instructions{font-size:.82rem;color:var(--muted);line-height:1.8;flex:1;min-width:220px}.control-buttons{display:flex;gap:8px;flex-wrap:wrap}
-.overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#061526b8;backdrop-filter:blur(8px);z-index:4;padding:20px}.overlay-card{background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px #0003}.overlay-card h3{margin:0 0 8px;font-size:1.5rem}.overlay-card p{color:var(--muted);line-height:1.8;margin:0 0 16px}
-.toast{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);background:#071321e8;color:#fff;border-radius:99px;padding:9px 14px;font-size:.8rem;opacity:0;pointer-events:none;transition:opacity .2s;white-space:nowrap}.toast.show{opacity:1}
-footer{text-align:center;color:#8290a5;font-size:.75rem;padding:4px}.setting-row select, #pp-ai{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 10px;border-radius:9px}.setting-row label{font-size:.8rem;color:var(--muted)}
-@media(max-width:850px){.game-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.game-card{min-height:155px}}
-@media(max-width:500px){#app{padding:7px;gap:8px}.top{padding:10px 12px}.brand-mark{width:38px;height:38px}.pill{font-size:.7rem;padding:6px 8px}.hero{padding:21px 17px}.game-grid{padding:12px;gap:10px}.game-card{min-height:145px;padding:12px 8px}.game-emoji{font-size:2.2rem}#viewport{height:58dvh;min-height:320px}.gamebar{padding:10px;gap:5px}.gamebar h2{font-size:.9rem}.btn{padding:8px 10px;font-size:.82rem}.stats{font-size:.78rem}.controls{padding:11px}.instructions{min-width:100%;font-size:.78rem}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#fff0df">
+
+    <title>Pocket Arcade | آرکید جیبی</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="js/app.js" defer></script>
+    <script src="js/billiards.js" defer></script>
+    <script src="js/pingpong.js" defer></script>
+    <script src="js/snake.js" defer></script>
+    <script src="js/hockey.js" defer></script>
 </head>
+
 <body>
-<div id="app">
-<header class="top">
-  <div class="brand"><div class="brand-mark">◈</div><div><h1>Pocket Arcade 3D</h1><p>آرکید سه‌بعدی جیبی</p></div></div>
-  <div style="display:flex;gap:8px;align-items:center"><button class="btn" id="theme-toggle" type="button" onclick="toggleTheme()">🌙 حالت تیره</button><span class="pill">نسخه پیشرفته</span></div>
-</header>
-<section id="hub" class="panel">
-  <div class="hero"><h2>بازی را انتخاب کن 🎮</h2><p>چهار بازی با صحنه سه‌بعدی، نورپردازی، سایه و کنترل لمسی. برای بهترین تجربه، گوشی را افقی هم امتحان کن.</p></div>
-  <div class="game-grid">
-    <button class="game-card" onclick="launch('billiard')"><span class="game-emoji">🎱</span><strong>بیلیارد سه‌بعدی</strong><small>نشانه‌گیری، ضربه و برخورد توپ‌ها</small><span class="best" id="best-billiard">رکورد: ۰</span></button>
-    <button class="game-card" onclick="launch('pingpong')"><span class="game-emoji">🏓</span><strong>پینگ‌پونگ سه‌بعدی</strong><small>رقابت با حریف هوشمند</small><span class="best" id="best-pingpong">رکورد: ۰</span></button>
-    <button class="game-card" onclick="launch('snake')"><span class="game-emoji">🐍</span><strong>مار سه‌بعدی</strong><small>جمع‌کردن گوی‌ها و رشد مار</small><span class="best" id="best-snake">رکورد: ۰</span></button>
-    <button class="game-card" onclick="launch('bounce')"><span class="game-emoji">🔴</span><strong>توپ پرشی سه‌بعدی</strong><small>پرش، حرکت و گرفتن حلقه‌ها</small><span class="best" id="best-bounce">رکورد: ۰</span></button>
-  </div>
-  <div class="note"><b>راهنما:</b> بیلیارد با نمای کاملاً از بالا و قانون ۸ توپ، پینگ‌پونگ با تنظیم قدرت ربات، مار با عبور از لبه‌ها و توپ پرشی با فرود دقیق‌تر. برای بارگذاری موتور گرافیکی به اینترنت نیاز است.</div>
-</section>
-<section id="game" class="panel">
-  <div class="gamebar"><div class="gamebar-left"><button class="btn" onclick="backToHub()">← منو</button><h2 id="game-title">بازی</h2></div><div class="stats" id="stats">امتیاز: ۰</div><button class="btn primary" onclick="restartGame()">شروع مجدد</button></div>
-  <div id="viewport"><div class="hud"><span id="hud-left">حالت سه‌بعدی</span><span id="hud-right">لمسی</span></div><div class="overlay" id="overlay"><div class="overlay-card"><h3 id="over-title">پایان بازی</h3><p id="over-text"></p><button class="btn primary" onclick="restartGame()">بازی دوباره</button> <button class="btn" onclick="backToHub()">منو</button></div></div><div class="toast" id="toast"></div></div>
-  <div class="controls"><div class="instructions" id="instructions">راهنمای بازی</div><div class="control-buttons" id="control-buttons"></div></div>
-</section>
-<footer>ساخته‌شده با HTML، JavaScript و WebGL · مناسب مرورگرهای جدید</footer>
+
+<div class="app-shell">
+
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-icon">✦</div>
+
+            <div>
+                <h1>Pocket Arcade</h1>
+                <p>آرکید جیبی</p>
+            </div>
+        </div>
+
+        <button id="themeToggle" class="theme-button" aria-label="تغییر تم">
+            🌙
+        </button>
+    </header>
+
+    <main>
+
+        <section class="hero clay">
+            <div>
+                <span class="eyebrow">ARCADE CLUB</span>
+                <h2>وقت بازیه! 🎮</h2>
+                <p>بازی موردعلاقه‌ات رو انتخاب کن.</p>
+            </div>
+
+            <div class="hero-shape">✹</div>
+        </section>
+
+        <section class="game-grid" id="gameGrid">
+
+            <button class="game-card clay" data-game="billiards">
+                <div class="game-art pool-art">
+                    <span class="pool-ball ball-eight">8</span>
+                    <span class="small-ball small-ball-one"></span>
+                    <span class="small-ball small-ball-two"></span>
+                </div>
+
+                <h3>بیلیارد</h3>
+                <p>نشانه‌گیری و ضربه</p>
+
+                <span class="play-label">بازی کن ←</span>
+            </button>
+
+            <button class="game-card clay" data-game="pingpong">
+                <div class="game-art ping-art">
+                    <span class="racket-art"></span>
+                    <span class="ping-ball-art"></span>
+                </div>
+
+                <h3>پینگ‌پنگ</h3>
+                <p>رالی با حریف هوشمند</p>
+
+                <span class="play-label">بازی کن ←</span>
+            </button>
+
+            <button class="game-card clay" data-game="snake">
+                <div class="game-art snake-art">
+                    <span class="snake-art-symbol">〰</span>
+                    <span class="snake-art-dot"></span>
+                </div>
+
+                <h3>مار مینیمال</h3>
+                <p>جمع کن و رشد کن</p>
+
+                <span class="play-label">بازی کن ←</span>
+            </button>
+
+            <button class="game-card clay" data-game="hockey">
+                <div class="game-art hockey-art">
+                    <span class="hockey-art-puck"></span>
+                    <span class="hockey-art-mallet mallet-one"></span>
+                    <span class="hockey-art-mallet mallet-two"></span>
+                </div>
+
+                <h3>هاکی رومیزی</h3>
+                <p>گل بزن و برنده شو</p>
+
+                <span class="play-label">بازی کن ←</span>
+            </button>
+
+        </section>
+
+        <section class="record-card clay">
+            <span class="record-icon">🏆</span>
+
+            <div>
+                <strong>رکوردهای تو</strong>
+                <p>بهترین امتیازت رو ثبت کن.</p>
+            </div>
+
+            <strong id="totalRecord">۰</strong>
+        </section>
+
+        <section class="play-screen clay hidden" id="playScreen">
+
+            <header class="play-header">
+
+                <button id="backButton" class="back-button">
+                    ← بازگشت
+                </button>
+
+                <div class="play-title">
+                    <span class="eyebrow" id="gameKicker">ARCADE</span>
+                    <h2 id="gameHeading">بازی</h2>
+                </div>
+
+                <div class="score-card">
+                    <span>امتیاز</span>
+                    <strong id="score">۰</strong>
+                </div>
+
+            </header>
+
+            <div class="canvas-wrap">
+                <canvas id="gameCanvas" width="900" height="600"></canvas>
+
+                <div class="canvas-hint" id="canvasHint">
+                    برای شروع لمس کن
+                </div>
+            </div>
+
+            <div class="game-controls" id="gameControls"></div>
+
+            <div class="mobile-controls hidden" id="mobileControls">
+                <button data-dir="up">▲</button>
+
+                <div>
+                    <button data-dir="left">◀</button>
+                    <button data-dir="down">▼</button>
+                    <button data-dir="right">▶</button>
+                </div>
+            </div>
+
+            <footer class="play-footer">
+                <span id="gameMessage">آماده‌ای؟</span>
+
+                <button id="restartButton" class="primary-button">
+                    شروع دوباره ↻
+                </button>
+            </footer>
+
+        </section>
+
+    </main>
+
+    <footer class="app-footer">
+        Pocket Arcade · بازی کن، رکورد بزن!
+    </footer>
+
 </div>
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-<script>
-'use strict';
-const $=id=>document.getElementById(id);
-const fa=n=>String(Math.round(n)).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[+d]);
-let renderer,scene,camera,clock,raf=0,gameType=null,objects=[],listeners=[],state={},lastToast=0;
-let records={};try{records=JSON.parse(localStorage.getItem('pocket_arcade_3d_records')||'{}')||{}}catch(e){}
-function toggleTheme(){document.body.classList.toggle('dark');const d=document.body.classList.contains('dark');$('theme-toggle').textContent=d?'☀️ حالت روشن':'🌙 حالت تیره';try{localStorage.setItem('pocket_arcade_theme',d?'dark':'light')}catch(e){}}
-try{if(localStorage.getItem('pocket_arcade_theme')==='dark'){document.body.classList.add('dark');$('theme-toggle').textContent='☀️ حالت روشن'}}catch(e){}
-function refreshRecords(){['billiard','pingpong','snake','bounce'].forEach(k=>{const el=$('best-'+k);if(el)el.textContent='رکورد: '+fa(records[k]||0)})}refreshRecords();
-function addListener(el,type,fn,opts){el.addEventListener(type,fn,opts);listeners.push(()=>el.removeEventListener(type,fn,opts))}
-function clearScene(){cancelAnimationFrame(raf);listeners.forEach(fn=>fn());listeners=[];if(renderer){renderer.dispose();renderer.domElement.remove()}renderer=null;scene=null;camera=null;objects=[];state={};$('overlay').style.display='none';$('control-buttons').innerHTML=''}
-function launch(type){clearScene();gameType=type;$('hub').style.display='none';$('game').style.display='block';const titles={billiard:'بیلیارد سه‌بعدی',pingpong:'پینگ‌پونگ سه‌بعدی',snake:'مار سه‌بعدی',bounce:'توپ پرشی سه‌بعدی'};$('game-title').textContent=titles[type];init3D();({billiard:initBilliard,pingpong:initPingPong,snake:initSnake,bounce:initBounce})[type]();resize();raf=requestAnimationFrame(loop)}
-function backToHub(){clearScene();gameType=null;$('game').style.display='none';$('hub').style.display='block';refreshRecords()}
-function restartGame(){if(gameType)launch(gameType)}
-function init3D(){const host=$('viewport');scene=new THREE.Scene();scene.background=new THREE.Color('#081523');scene.fog=new THREE.Fog('#081523',18,36);camera=new THREE.PerspectiveCamera(43,host.clientWidth/host.clientHeight,.1,100);renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));renderer.setSize(host.clientWidth,host.clientHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;host.insertBefore(renderer.domElement,host.firstChild);clock=new THREE.Clock();scene.add(new THREE.HemisphereLight(0xdceeff,0x253347,2.0));const key=new THREE.DirectionalLight(0xfff1d5,3.2);key.position.set(-5,10,7);key.castShadow=true;key.shadow.mapSize.set(1024,1024);scene.add(key);const fill=new THREE.DirectionalLight(0x65baff,1.4);fill.position.set(5,5,-6);scene.add(fill);const floor=new THREE.Mesh(new THREE.PlaneGeometry(80,80),new THREE.MeshStandardMaterial({color:'#101d2c',roughness:.92}));floor.rotation.x=-Math.PI/2;floor.position.y=-.45;floor.receiveShadow=true;scene.add(floor);addListener(window,'resize',resize);addListener(renderer.domElement,'contextmenu',e=>e.preventDefault())}
-function resize(){if(!renderer||!camera)return;const host=$('viewport');camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)}
-function mesh(geo,mat,x=0,y=0,z=0,cast=true){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=cast;m.receiveShadow=true;scene.add(m);objects.push(m);return m}
-function mat(color,roughness=.5,metalness=0){return new THREE.MeshStandardMaterial({color,roughness,metalness})}
-function sphere(r,color,x,y,z,rough=.25){const m=mesh(new THREE.SphereGeometry(r,32,24),mat(color,rough));m.position.set(x,y,z);return m}
-function box(w,h,d,color,x,y,z,rough=.6){return mesh(new THREE.BoxGeometry(w,h,d),mat(color,rough),x,y,z)}
-function ballShadow(ball){/* shadows are provided by the directional light */}
-function setStats(s){$('stats').textContent=s}
-function setHelp(s,left='حالت سه‌بعدی',right='کنترل لمسی'){$('instructions').textContent=s;$('hud-left').textContent=left;$('hud-right').textContent=right}
-function button(label,fn,cls=''){const b=document.createElement('button');b.className='btn '+cls;b.textContent=label;b.onclick=fn;$('control-buttons').appendChild(b)}
-function endGame(title,text,score=0){$('over-title').textContent=title;$('over-text').textContent=text;$('overlay').style.display='flex';records[gameType]=Math.max(records[gameType]||0,score);try{localStorage.setItem('pocket_arcade_3d_records',JSON.stringify(records))}catch(e){}refreshRecords()}
-function toast(s){if(performance.now()-lastToast<1000)return;lastToast=performance.now();$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1400)}
-function loop(){if(!renderer)return;const dt=Math.min(clock.getDelta(),.033);if(state.update)state.update(dt);renderer.render(scene,camera);raf=requestAnimationFrame(loop)}
-function groundPlane(y=0){const p=mesh(new THREE.PlaneGeometry(12,12),mat('#142a3a',.95),0,y,0,false);p.rotation.x=-Math.PI/2;return p}
-function pointerNdc(e){const r=renderer.domElement.getBoundingClientRect();return new THREE.Vector2(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1)}
-function intersectGround(e,y=0){const ray=new THREE.Raycaster();ray.setFromCamera(pointerNdc(e),camera);const plane=new THREE.Plane(new THREE.Vector3(0,1,0),-y);const p=new THREE.Vector3();return ray.ray.intersectPlane(plane,p)?p:null}
 
-// Overhead pool: six pockets, cue aiming, power control, basic 8-ball rules and AI opponent.
-function initBilliard(){
- const W=7.2,L=12.2,R=.19,rail=.25;
- camera=new THREE.OrthographicCamera(-5.8,5.8,7.2,-7.2,.1,80);
- camera.position.set(0,22,.001);camera.lookAt(0,0,0);camera.up.set(0,0,-1);camera.updateProjectionMatrix();
- // remove perspective floor feel and build a readable top-down table
- box(W+.75,.34,L+.75,'#5b3523',0,-.03,0,.32);box(W,.12,L,'#08734d',0,.17,0,.9);
- for(const x of [-W/2-.18,W/2+.18])box(.3,.2,L+.18,'#9a633b',x,.22,0,.3);
- for(const z of [-L/2-.18,L/2+.18])box(W+.18,.2,.3,'#9a633b',0,.22,z,.3);
- const pockets=[[-W/2,-L/2],[0,-L/2],[W/2,-L/2],[-W/2,L/2],[0,L/2],[W/2,L/2]];
- pockets.forEach(([x,z])=>{mesh(new THREE.CylinderGeometry(.34,.35,.09,32),mat('#020408',.98),x,.255,z,false)});
- for(let i=1;i<6;i++)for(const z of [-L/2-.16,L/2+.16])sphere(.045,'#f4d5a0',-W/2+i*W/6,.34,z,.3);
- const cue=sphere(R,'#fffdf2',0,.48,3.9,.12);cue.userData={vx:0,vz:0,cue:true};
- const colors=['#facc15','#2563eb','#dc2626','#7c3aed','#f97316','#16a34a','#db2777','#171717','#eab308','#2563eb','#dc2626','#7c3aed','#f97316','#16a34a','#db2777'];
- const balls=[];let idx=0;
- // regulation-style 15-ball triangle, 8 ball near the center
- for(let row=0;row<5;row++)for(let col=0;col<=row;col++){
-   const number=idx+1, x=(col-row/2)*.405, z=-2.35-row*.37;
-   let color=number===8?'#050505':colors[idx];
-   const b=sphere(R,color,x,.48,z,.19);b.userData={vx:0,vz:0,number,group:number===8?'eight':number<=7?'solid':'stripe'};
-   if(number>=9&&number!==8){const stripe=mesh(new THREE.TorusGeometry(R*.72,.035,8,24),mat('#f8fafc',.25),x,.48,z);stripe.rotation.x=Math.PI/2;b.userData.stripeMesh=stripe;}
-   balls.push(b);idx++;
- }
- const aimLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3(0,.7,1)]),new THREE.LineDashedMaterial({color:0xffffff,dashSize:.2,gapSize:.13}));scene.add(aimLine);aimLine.visible=false;
- const cueStick=mesh(new THREE.CylinderGeometry(.035,.055,4,12),mat('#c49a63',.4),0,.5,5,false);cueStick.rotation.x=Math.PI/2;cueStick.visible=false;
- state={cue,balls,aimLine,cueStick,aiming:false,aimPoint:null,shots:0,playerTurn:true,groups:{player:null,ai:null},turnPotted:[],done:false,tableW:W,tableL:L,ballR:R,power:.55,difficulty:1,turnResolved:false,
- update(dt){
-   const all=[cue,...balls.filter(b=>b.visible)];
-   for(const b of all){
-     b.position.x+=b.userData.vx*dt;b.position.z+=b.userData.vz*dt;
-     b.userData.vx*=Math.pow(.987,dt*60);b.userData.vz*=Math.pow(.987,dt*60);
-     if(Math.abs(b.userData.vx)<.025)b.userData.vx=0;if(Math.abs(b.userData.vz)<.025)b.userData.vz=0;
-     // Rails are solid except the six pocket mouths.
-     const bx=b.position.x,bz=b.position.z;
-     const nearPocket=pockets.some(([px,pz])=>Math.hypot(bx-px,bz-pz)<.52);
-     if(bx<-W/2+R&&!nearPocket){b.position.x=-W/2+R;b.userData.vx=Math.abs(b.userData.vx)*.86}
-     if(bx>W/2-R&&!nearPocket){b.position.x=W/2-R;b.userData.vx=-Math.abs(b.userData.vx)*.86}
-     if(bz<-L/2+R&&!nearPocket){b.position.z=-L/2+R;b.userData.vz=Math.abs(b.userData.vz)*.86}
-     if(bz>L/2-R&&!nearPocket){b.position.z=L/2-R;b.userData.vz=-Math.abs(b.userData.vz)*.86}
-     if(!b.userData.cue){for(const [px,pz] of pockets){if(Math.hypot(b.position.x-px,b.position.z-pz)<.31){b.visible=false;b.userData.vx=b.userData.vz=0;this.turnPotted.push(b.userData.number);if(b.userData.stripeMesh)b.userData.stripeMesh.visible=false;break}}}
-   }
-   const active=[cue,...balls.filter(b=>b.visible)];
-   for(let i=0;i<active.length;i++)for(let j=i+1;j<active.length;j++){
-     const a=active[i],b=active[j],dx=b.position.x-a.position.x,dz=b.position.z-a.position.z,d=Math.hypot(dx,dz),min=R*2;
-     if(d>0&&d<min){const nx=dx/d,nz=dz/d,ov=min-d;a.position.x-=nx*ov/2;a.position.z-=nz*ov/2;b.position.x+=nx*ov/2;b.position.z+=nz*ov/2;const rel=(b.userData.vx-a.userData.vx)*nx+(b.userData.vz-a.userData.vz)*nz;if(rel<0){const imp=-rel*.96;a.userData.vx-=imp*nx;a.userData.vz-=imp*nz;b.userData.vx+=imp*nx;b.userData.vz+=imp*nz}}
-   }
-   // Keep stripe bands attached to their balls.
-   balls.forEach(b=>{if(b.userData.stripeMesh){b.userData.stripeMesh.position.x=b.position.x;b.userData.stripeMesh.position.z=b.position.z;b.userData.stripeMesh.visible=b.visible}});
-   const moving=all.some(b=>Math.hypot(b.userData.vx,b.userData.vz)>.04);
-   if(!moving&&this.shotPending){this.shotPending=false;this.resolveTurn()}
-   const remain=balls.filter(b=>b.visible).length;
-   setStats(`${this.playerTurn?'نوبت شما':'نوبت حریف'} · ضربه ${fa(this.shots)} · توپ‌ها ${fa(remain)}`);
-   if(!moving&&!this.playerTurn&&!this.done&&!this.aiThinking){this.aiThinking=true;setTimeout(()=>{if(gameType==='billiard'&&!state.done&&!state.playerTurn){this.aiThinking=false;this.aiShot()}},500)}
- },
- resolveTurn(){
-   const p=this.turnPotted.slice();this.turnPotted=[];
-   const eightPotted=p.includes(8);
-   const ownGroup=this.playerTurn?this.groups.player:this.groups.ai;
-   const ownRemaining=()=>balls.some(b=>b.visible&&b.userData.group===ownGroup);
-   if(eightPotted){
-     const won=!!ownGroup&&!ownRemaining();
-     this.done=true;endGame(won?(this.playerTurn?'بردی! توپ ۸ را قانونی پاکت کردی 🎱':'حریف برنده شد'):(this.playerTurn?'با پاکت‌کردن زودهنگام توپ ۸ باختی':'حریف توپ ۸ را زود پاکت کرد؛ برنده شدی!'),`ضربه‌های شما: ${fa(this.shots)}`,won?this.shots:0);return;
-   }
-   if(!this.groups.player&&p.some(n=>n!==8)){
-     const first=p.find(n=>n!==8);const group=first<=7?'solid':'stripe';
-     this.groups.player=group;this.groups.ai=group==='solid'?'stripe':'solid';
-     toast(`گروه شما: ${group==='solid'?'توپ‌های ساده ۱ تا ۷':'توپ‌های راه‌راه ۹ تا ۱۵'}`);
-   }
-   const group=this.playerTurn?this.groups.player:this.groups.ai;
-   const pocketedOwn=p.some(n=>group&&(group==='solid'?n>=1&&n<=7:n>=9&&n<=15));
-   if(!pocketedOwn)this.playerTurn=!this.playerTurn;
-   if(this.playerTurn){$('hud-right').textContent='نوبت شما'}else $('hud-right').textContent='نوبت حریف';
- },
- aiShot(){
-   if(this.done)return;
-   const own=this.groups.ai;
-   let targets=balls.filter(b=>b.visible&&b.userData.number!==8&&(!own||b.userData.group===own));
-   if(own&&targets.length===0)targets=balls.filter(b=>b.visible&&b.userData.number===8);
-   if(!targets.length)targets=balls.filter(b=>b.visible&&b.userData.number!==8);
-   if(!targets.length)return;
-   // Pick the nearest target, aim toward a pocket with a small difficulty-dependent error.
-   let target=targets.sort((a,b)=>Math.hypot(a.position.x-cue.position.x,a.position.z-cue.position.z)-Math.hypot(b.position.x-cue.position.x,b.position.z-cue.position.z))[0];
-   const [px,pz]=pockets.sort((a,b)=>Math.hypot(target.position.x-a[0],target.position.z-a[1])-Math.hypot(target.position.x-b[0],target.position.z-b[1]))[0];
-   let ux=target.position.x-px,uz=target.position.z-pz,ln=Math.hypot(ux,uz)||1;ux/=ln;uz/=ln;
-   const error=(1-this.difficulty)*.45;const ang=(Math.random()-.5)*error,cs=Math.cos(ang),sn=Math.sin(ang),tx=ux*cs-uz*sn,tz=ux*sn+uz*cs;
-   const dx=target.position.x-cue.position.x,dz=target.position.z-cue.position.z,d=Math.hypot(dx,dz)||1;
-   cue.userData.vx=dx/d* (3.4+this.difficulty*2.5);cue.userData.vz=dz/d*(3.4+this.difficulty*2.5);
-   target.userData.vx=tx*(2.5+this.difficulty*2.8);target.userData.vz=tz*(2.5+this.difficulty*2.8);
-   this.shots++;this.shotPending=true;this.turnPotted=[];
- },
-};
-function idle(){return [state.cue,...state.balls.filter(b=>b.visible)].every(b=>Math.hypot(b.userData.vx,b.userData.vz)<.04)}
-function showAim(p){if(!p)return;state.aimPoint=p;const dx=state.cue.position.x-p.x,dz=state.cue.position.z-p.z,len=Math.hypot(dx,dz);if(len<.01)return;const ux=dx/len,uz=dz/len;state.aimLine.geometry.dispose();state.aimLine.geometry=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(state.cue.position.x,.72,state.cue.position.z),new THREE.Vector3(state.cue.position.x+ux*4,.72,state.cue.position.z+uz*4)]);state.aimLine.computeLineDistances();state.aimLine.visible=true;state.cueStick.visible=true;state.cueStick.position.set(state.cue.position.x-ux*1.2,.52,state.cue.position.z-uz*1.2);state.cueStick.rotation.set(Math.PI/2,0,-Math.atan2(uz,ux)+Math.PI/2)}
-addListener(renderer.domElement,'pointerdown',e=>{if(!idle()||state.done||!state.playerTurn)return;const p=intersectGround(e,.25);if(!p)return;state.aiming=true;renderer.domElement.setPointerCapture(e.pointerId);showAim(p)});
-addListener(renderer.domElement,'pointermove',e=>{if(state.aiming)showAim(intersectGround(e,.25))});
-addListener(renderer.domElement,'pointerup',e=>{if(!state.aiming)return;state.aiming=false;const p=intersectGround(e,.25)||state.aimPoint;state.aimLine.visible=false;state.cueStick.visible=false;if(!p)return;const dx=state.cue.position.x-p.x,dz=state.cue.position.z-p.z,len=Math.hypot(dx,dz);if(len>.1){const power=2+state.power*7;state.cue.userData.vx=dx/len*power;state.cue.userData.vz=dz/len*power;state.shots++;state.shotPending=true;state.turnPotted=[]}});
-function addPoolControls(){
- const wrap=document.createElement('div');wrap.className='setting-row';wrap.style.cssText='display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 8px';
- wrap.innerHTML='<label for="pool-power">قدرت ضربه</label><input id="pool-power" type="range" min="0.1" max="1" step="0.05" value="0.55" style="width:130px"><label for="pool-ai">قدرت حریف</label><select id="pool-ai"><option value="0.35">آسان</option><option value="0.65" selected>متوسط</option><option value="1">حرفه‌ای</option></select>';
- $('control-buttons').appendChild(wrap);
- addListener($('pool-power'),'input',e=>state.power=Number(e.target.value));
- addListener($('pool-ai'),'change',e=>state.difficulty=Number(e.target.value));
-}
-setHelp('نمای کاملاً از بالا. از توپ سفید به سمت مخالف مسیر دلخواه بکش؛ فاصله حرکت، زاویه و قدرت ضربه را تعیین می‌کند. توپ ۸ را فقط پس از پاکت‌کردن گروه خودت بزن.','قانون ۸ توپ','کشیدن برای نشانه‌گیری');
-button('راهنمای قانون ۸',()=>toast('پس از تعیین گروه، اول همه توپ‌های گروه خودت و در آخر توپ ۸ را پاکت کن.'),'');addPoolControls();
-}
-
-// 3D ping-pong: table, net, moving sphere, paddles; user drags horizontally in the near half.
-function initPingPong(){
- camera.position.set(0,7.7,10.5);camera.lookAt(0,.4,0);
- const tw=5.2,tl=8.6;box(tw,.18,tl,'#0870b9',0,.55,0,.35);box(tw+.3,.22,.16,'#e5edf4',0,.55,tl/2+.04,.25);box(tw+.3,.22,.16,'#e5edf4',0,.55,-tl/2-.04,.25);box(.12,.22,tl+.2,'#e5edf4',-tw/2-.04,.55,0,.3);box(.12,.22,tl+.2,'#e5edf4',tw/2+.04,.55,0,.3);
- const net=box(tw,.52,.08,'#e8eef5',0,.9,0,.85);net.material.transparent=true;net.material.opacity=.65;box(tw,.06,.11,'#172033',0,1.18,0,.6);
- for(const z of [-2.7,2.7])for(const x of [-2.2,2.2]){const leg=box(.14,.55,.14,'#46576a',x,.2,z,.4)}
- const player=box(1.15,.13,.24,'#ef4444',0,1.05,3.15,.25),ai=box(1.15,.13,.24,'#facc15',0,1.05,-3.15,.25);
- const ball=sphere(.13,'#fff9db',0,1.15,0,.22);ball.userData.vx=2.2;ball.userData.vz=3.5;
- state={player,ai,ball,ps:0,as:0,serve:0,aiSpeed:2.5,difficulty:0.6,update(dt){const b=this.ball;b.position.x+=b.userData.vx*dt;b.position.z+=b.userData.vz*dt;
- if(Math.abs(b.position.x)>tw/2-.15){b.position.x=Math.sign(b.position.x)*(tw/2-.15);b.userData.vx*=-1}
- // Paddle collision at ends
- if(b.userData.vz>0&&b.position.z>2.9&&b.position.z<3.4&&Math.abs(b.position.x-player.position.x)<.75){b.position.z=2.88;b.userData.vz=-Math.abs(b.userData.vz)*1.025;b.userData.vx+=(b.position.x-player.position.x)*1.2}
- if(b.userData.vz<0&&b.position.z< -2.9&&b.position.z> -3.4&&Math.abs(b.position.x-ai.position.x)<.75){b.position.z=-2.88;b.userData.vz=Math.abs(b.userData.vz)*1.015;b.userData.vx+=(b.position.x-ai.position.x)*.5}
- // Net collision: if crossing center low enough, bounce back / award point
- if(Math.abs(b.position.z)<.08&&b.position.y<1.02){b.userData.vz*=-1;b.position.z=Math.sign(b.position.z||1)*.1}
- this.ai.position.x+=Math.max(-this.aiSpeed*dt,Math.min(this.aiSpeed*dt,b.position.x-this.ai.position.x));this.ai.position.x=Math.max(-tw/2+.6,Math.min(tw/2-.6,this.ai.position.x));
- if(b.position.z>tl/2){this.as++;this.resetBall(-1)}else if(b.position.z< -tl/2){this.ps++;this.resetBall(1)}
- setStats(`شما ${fa(this.ps)} — ${fa(this.as)} ربات`);
- if(this.ps>=7||this.as>=7){this.done=true;endGame(this.ps>this.as?'برنده شدی! 🏆':'ربات برنده شد',`نتیجه: ${fa(this.ps)} - ${fa(this.as)}`,this.ps)}
- },resetBall(dir){const b=this.ball;b.position.set(0,1.15,0);b.userData.vx=(Math.random()-.5)*2.2;b.userData.vz=dir*3.2}};
- function move(e){const p=intersectGround(e,1.05);if(p)player.position.x=Math.max(-tw/2+.6,Math.min(tw/2-.6,p.x))}
- addListener(renderer.domElement,'pointerdown',move);addListener(renderer.domElement,'pointermove',e=>{if(e.buttons||e.pointerType==='touch')move(e)});
- setHelp('پدال قرمز را با کشیدن انگشت روی میز به چپ و راست حرکت بده. توپ از روی تور عبور می‌کند؛ اگر توپ پایین‌تر از لبه تور باشد برمی‌گردد.','اول تا ۷','حرکت افقی');
- const wrap=document.createElement('div');wrap.style.cssText='display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 8px';wrap.innerHTML='<label for="pp-ai">قدرت حریف</label><select id="pp-ai"><option value="1.2">آسان</option><option value="2.5" selected>متوسط</option><option value="4.2">حرفه‌ای</option></select>';
- $('control-buttons').appendChild(wrap);addListener($('pp-ai'),'change',e=>state.aiSpeed=Number(e.target.value));button('شروع مجدد',restartGame,'primary')
-}
-
-// 3D snake on a lit tiled board; tap/swipe/keyboard direction.
-function initSnake(){
- camera.position.set(0,10,10);camera.lookAt(0,0,0);const size=9;
- const board=mesh(new THREE.BoxGeometry(9.4,.18,9.4),mat('#1e3447',.8),0,-.16,0); 
- for(let i=0;i<9;i++)for(let j=0;j<9;j++){const tile=box(.98,.025,.98,(i+j)%2?'#27465a':'#203a4d',(i-4)*1.02,-.055,(j-4)*1.02,.9);tile.castShadow=false}
- state={size,dir:{x:1,z:0},next:{x:1,z:0},snake:[{x:2,z:0},{x:1,z:0},{x:0,z:0}],food:null,score:0,acc:0,done:false,parts:[],foodMesh:null,update(dt){if(this.done)return;this.acc+=dt;if(this.acc<.19)return;this.acc=0;this.dir={...this.next};const h={x:this.snake[0].x+this.dir.x,z:this.snake[0].z+this.dir.z};const ate=this.food&&h.x===this.food.x&&h.z===this.food.z;h.x=(h.x+9)%9-4;h.z=(h.z+9)%9-4;if(this.snake.slice(0,ate?this.snake.length:this.snake.length-1).some(p=>p.x===h.x&&p.z===h.z)){this.done=true;endGame('مار به خودش برخورد کرد!','امتیاز: '+fa(this.score),this.score);return}this.snake.unshift(h);if(ate){this.score+=10;this.spawnFood();setStats('امتیاز: '+fa(this.score))}else this.snake.pop();this.drawParts()} ,spawnFood(){if(this.foodMesh)scene.remove(this.foodMesh);let p;do{p={x:Math.floor(Math.random()*9)-4,z:Math.floor(Math.random()*9)-4}}while(this.snake.some(s=>s.x===p.x&&s.z===p.z));this.food=p;this.foodMesh=sphere(.27,'#fb7185',p.x*1.02,.25,p.z*1.02,.22)},drawParts(){while(this.parts.length<this.snake.length){const p=sphere(.32,'#38bdf8',0,.22,0,.3);this.parts.push(p)}while(this.parts.length>this.snake.length){scene.remove(this.parts.pop())}this.parts.forEach((p,i)=>{const s=this.snake[i];p.position.set(s.x*1.02,.22,s.z*1.02);p.material.color.set(i===0?'#a5f3fc':'#0ea5e9')})}};
- state.spawnFood();state.drawParts();setStats('امتیاز: ۰');
- function turn(x,z){if(x!==-state.dir.x||z!==-state.dir.z)state.next={x,z}}
- addListener(window,'keydown',e=>{if(e.key==='ArrowUp')turn(0,-1);if(e.key==='ArrowDown')turn(0,1);if(e.key==='ArrowLeft')turn(-1,0);if(e.key==='ArrowRight')turn(1,0)});
- let start=null;addListener(renderer.domElement,'pointerdown',e=>{start={x:e.clientX,y:e.clientY}});addListener(renderer.domElement,'pointerup',e=>{if(!start)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.max(Math.abs(dx),Math.abs(dy))>18){if(Math.abs(dx)>Math.abs(dy))turn(dx>0?1:-1,0);else turn(0,dy>0?1:-1)}start=null});
- setHelp('روی صفحه انگشت بکش تا جهت مار عوض شود؛ کلیدهای جهت‌دار هم کار می‌کنند. از بدن خودت دوری کن؛ عبور از لبه‌ها مجاز است.','مار سه‌بعدی','کشیدن / کلید');button('شروع مجدد',restartGame,'primary')
-}
-
-// Bounce: platform landings are detected on downward crossings of platform tops.
-function initBounce(){
- camera.position.set(0,8.5,10);camera.lookAt(0,1.3,0);
- box(7,.3,10,'#203247',0,-.2,0,.8);
- const platforms=[{x:0,z:3,w:4,d:1.4,top:.325},{x:-1.5,z:1,w:2.3,d:1,top:.325},{x:1.4,z:-1,w:2.2,d:1,top:.325},{x:0,z:-3.2,w:3,d:1.2,top:.325}];
- platforms.forEach((p,i)=>box(p.w,.25,p.d,['#0e7490','#2563eb','#0f766e','#1d4ed8'][i],p.x,.2,p.z,.35));
- const ball=sphere(.35,'#fb7185',0,.68,3,.18);ball.userData.vx=0;ball.userData.vy=0;ball.userData.vz=0;
- const rings=[];[[-1.5,.9,1],[1.4,.9,-1],[0,.9,-3.2]].forEach(([x,y,z])=>{const r=mesh(new THREE.TorusGeometry(.38,.07,12,32),mat('#facc15',.22,.4),x,y,z);r.rotation.x=Math.PI/2;rings.push({mesh:r,active:true})});
- const spike=mesh(new THREE.ConeGeometry(.32,.55,5),mat('#f43f5e',.35),2,.42,2);spike.rotation.z=Math.PI;
- state={ball,rings,score:0,done:false,grounded:true,update(dt){
-   if(this.done)return;const b=this.ball,prevY=b.position.y,prevX=b.position.x,prevZ=b.position.z;
-   b.userData.vy-=12*dt;b.position.y+=b.userData.vy*dt;b.position.x+=b.userData.vx*dt;b.position.z+=b.userData.vz*dt;
-   b.userData.vx*=Math.pow(.82,dt*10);b.userData.vz*=Math.pow(.9,dt*10);
-   let landed=false;
-   platforms.forEach(p=>{
-     const overlaps=Math.abs(b.position.x-p.x)<=p.w/2-.05&&Math.abs(b.position.z-p.z)<=p.d/2-.05;
-     if(overlaps&&b.userData.vy<0&&prevY>=p.top+.35&&b.position.y<=p.top+.35){
-       b.position.y=p.top+.35;b.userData.vy=5.8;landed=true;
-     }
-   });
-   // Starting platform is also a valid landing surface.
-   if(b.position.z>2.25&&b.position.z<3.8&&Math.abs(b.position.x)<1.9&&b.userData.vy<0&&prevY>=.68&&b.position.y<=.68){b.position.y=.68;b.userData.vy=5.8;landed=true}
-   this.grounded=landed;
-   if(b.position.x>1.55&&b.position.x<2.45&&b.position.z>1.55&&b.position.z<2.5&&b.position.y<.8){this.done=true;endGame('به مانع برخورد کردی!','حلقه‌های جمع‌شده: '+fa(this.score),this.score);return}
-   this.rings.forEach(r=>{if(r.active&&Math.hypot(b.position.x-r.mesh.position.x,b.position.y-r.mesh.position.y,b.position.z-r.mesh.position.z)<.65){r.active=false;r.mesh.visible=false;this.score++;setStats('حلقه‌ها: '+fa(this.score));if(this.score===3){this.done=true;endGame('عالی بود! 🎉','همه حلقه‌ها را جمع کردی.',this.score)}}});
-   if(b.position.y< -2||Math.abs(b.position.x)>4||Math.abs(b.position.z)>5){this.done=true;endGame('از مسیر خارج شدی!','حلقه‌های جمع‌شده: '+fa(this.score),this.score)}
- }};
- function move(d){if(state.done)return;ball.userData.vx=Math.max(-3.8,Math.min(3.8,ball.userData.vx+d*2.2))}
- function jump(){if(!state.done&&ball.userData.vy<1&&ball.position.y<1.12)ball.userData.vy=6.4}
- addListener(renderer.domElement,'pointerdown',e=>{const r=renderer.domElement.getBoundingClientRect(),x=(e.clientX-r.left)/r.width;if(x<.34)move(-1);else if(x>.66)move(1);else jump()});
- addListener(window,'keydown',e=>{if(e.key==='ArrowLeft'||e.key==='a')move(-1);if(e.key==='ArrowRight'||e.key==='d')move(1);if(e.key===' '||e.key==='ArrowUp')jump()});
- button('چپ ◀',()=>move(-1));button('پرش ⤴',jump,'green');button('راست ▶',()=>move(1));
- setHelp('برای حرکت از چپ و راست استفاده کن و روی پرش بزن. فرود باید روی سطح سکو باشد؛ حلقه‌ها را جمع کن و از مانع قرمز دوری کن.','۳ حلقه','لمس / کلیدهای جهت');
- setStats('حلقه‌ها: ۰');
-}
-</script>
 </body>
 </html>
